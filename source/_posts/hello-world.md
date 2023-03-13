@@ -1,10 +1,9 @@
 ---
 title: 测试post
-cover: ../images/wallhaven-l83ygy.png
+cover: https://pic.imgdb.cn/item/63c36ffdbe43e0d30ee1fbad.png
 ---
-Welcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).
 
-## Quick Start
+## hexo常用指令
 
 ### Create a new post
 

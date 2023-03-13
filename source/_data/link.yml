@@ -1,13 +1,49 @@
-- class_name: 友情链接
-  class_desc: 那些人，那些事
+- class_name: 推荐博客
+  class_desc: 大佬们，轮子缔造者
   link_list:
     - name: Hexo
       link: https://hexo.io/zh-tw/
       avatar: https://d33wubrfki0l68.cloudfront.net/6657ba50e702d84afb32fe846bed54fba1a77add/827ae/logo.svg
       descr: 快速、简单且强大的框架
     
+    - name: Jerry
+      link: https://butterfly.js.org/
+      avatar: https://butterfly.js.org/img/avatar.png
+      descr: A Simple and Card UI Design theme for Hexo
+    
+    - name: 安知鱼`Blog
+      link: https://anzhiy.cn/
+      avatar: https://img02.anzhiy.cn/adminuploads/1/2022/09/15/63232b7d91d22.jpg
+      descr: 生活明朗，万物可爱
+    
+    - name: つつの Blog
+      link: https://blog.tsutsu.one/
+      avatar: https://img.tsutsu.one/i-1/2022/05/26/628ef8a6e4797.jpg
+      descr: 想把海洋里所有鱼都握在手里，把森林里里所有花都插在心头.
+
+    - name: Fomalhaut🥝
+      link: https://www.fomal.cc/
+      avatar: https://www.fomal.cc/assets/avatar.webp
+      descr: Future is now 🍭🍭🍭
+
+    - name: Clouder’s Blog.
+      link: https://www.codein.icu/
+      avatatr: https://cdn.jsdelivr.net/gh/Clouder0/myPics/img/selficon2.png
+      descr: A student who enjoys tech & life.
+    
+
+- class_name: 友情链接
+  class_desc: 那些人，那些事
+  link_list:
+  
     - name: 咕咕咕
       link: https://cooooing.github.io/
       avatar: https://s1.ax1x.com/2022/03/13/bqyIpT.jpg
       descr: 路漫漫其修远兮，吾将上下而求索。
+    
+    - name: 酷丁的主页
+      link: https://coldin.top
+      avatar: https://coldin.top/avatar.png
+      descr: 一个羞涩的小朋友的自我介绍页面
+    
 
