@@ -219,8 +219,8 @@ collections:
             default: 250
             hint: 0～360。红 0、青 200、蓝紫 250、粉 345；默认 250
 
-          - label: 导航栏 GitHub 链接
+          - label: GitHub 链接
             name: githubUrl
             widget: string
-            hint: 也用作侧栏的 GitHub 图标链接
+            hint: 只用在侧栏的 GitHub 图标链接（导航栏的 GitHub 入口已移除；想加回来见 src/config.ts 的 navBarConfig）
 

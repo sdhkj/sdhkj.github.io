@@ -49,15 +49,17 @@ export const siteConfig: SiteConfig = {
 };
 
 export const navBarConfig: NavBarConfig = {
+	// 导航栏只保留站内三页；GitHub 链接移到侧栏（见下面 profileConfig.links），
+	// 想加回导航栏就取消注释：
 	links: [
 		LinkPreset.Home,
 		LinkPreset.Archive,
 		LinkPreset.About,
-		{
-			name: "GitHub",
-			url: siteConfigData.githubUrl, // Internal links should not include the base path, as it is automatically added
-			external: true, // Show an external link icon and will open in a new tab
-		},
+		// {
+		// 	name: "GitHub",
+		// 	url: siteConfigData.githubUrl, // Internal links should not include the base path, as it is automatically added
+		// 	external: true, // Show an external link icon and will open in a new tab
+		// },
 	],
 };
 
