@@ -38,7 +38,15 @@ export const siteConfig: SiteConfig = {
 		enable: true, // Display the table of contents on the right side of the post
 		depth: 2, // Maximum heading depth to show in the table, from 1 to 3
 	},
+	// favicon：数组非空就完全替换默认图标（默认那 8 个 PNG 仍留在 public/favicon/ 下）。
+	// 当前用的是冰淇淋图标，源图 public/favicon/ice-cream.png（200×200，本身就是透明底）。
+	// 重新生成：node scripts/make-favicons.mjs public/favicon/ice-cream.png
+	// 想换回旧图标：把下面 4 条注释掉（或整个数组清空）即可，默认图标会自动生效。
 	favicon: [
+		{ src: "/favicon/ice-cream/favicon-192.png", sizes: "192x192" },
+		{ src: "/favicon/ice-cream/favicon-180.png", sizes: "180x180" },
+		{ src: "/favicon/ice-cream/favicon-128.png", sizes: "128x128" },
+		{ src: "/favicon/ice-cream/favicon-32.png", sizes: "32x32" },
 		// Leave this array empty to use the default favicon
 		// {
 		//   src: '/favicon/icon.png',    // Path of the favicon, relative to the /public directory
