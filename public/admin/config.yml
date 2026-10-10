@@ -19,18 +19,18 @@ backend:
   name: github
   repo: sdhkj/sdhkj.github.io
   branch: main
-  # 只用「访问令牌（GitHub Personal Access Token）」登录，不需要任何 OAuth 中转服务：
-  # 这里既没有 base_url，也没有 auth_scope —— 那两个选项只跟 OAuth 有关，现在用不到了。
+  # 两种登录方式同时开放（auth_methods 只允许数组里列出的方式）：
   #
-  # 登录流程：打开 /admin → 点 “Sign In with Token” → 弹窗里会给出一条已经预选好权限的
-  # GitHub 令牌生成链接，生成后把令牌粘贴回弹窗即可。
+  # ① oauth —— 「用 GitHub 登录」一键登录
+  #    走 Cloudflare Worker 中转换 token：https://sveltia-cms-auth.sdhkj.workers.dev
+  #    ⚠️ workers.dev 在国内被 DNS 污染 + IP 阻断：浏览器需要走代理，且本机 hosts 里有一条
+  #       172.67.146.100 sveltia-cms-auth.sdhkj.workers.dev（详见根目录 README 第 5 节）
+  # ② token —— 「Sign In with Token」访问令牌登录
+  #    浏览器直连 GitHub API，不依赖代理；换设备/清缓存时重新粘贴一次令牌即可
   #
-  # 令牌只保存在你当前浏览器的 localStorage 里：不会写进仓库，也不经过任何第三方服务器
-  # （Sveltia 是浏览器直接调用 GitHub 的 API）。
-  #
-  # 以后想改回 OAuth 一键登录时，把这一行换成 auth_methods: [oauth, token]（或整行删掉，
-  # 默认两种都允许），并补上 base_url —— 完整步骤见根目录 README.md 第 5 节。
-  auth_methods: [token]
+  # 想只保留其中一种：改成 [oauth] 或 [token]。用 OAuth 时必须保留下面的 base_url。
+  auth_methods: [oauth, token]
+  base_url: https://sveltia-cms-auth.sdhkj.workers.dev
 
 # 本地写作不需要任何配置项：Sveltia 的 local_backend 已被官方标记为不支持并忽略
 # （写在配置里只会多一条 "option is not supported" 告警），本地写作真正生效的是
