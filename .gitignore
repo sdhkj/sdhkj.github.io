@@ -40,3 +40,6 @@ worker/.wrangler/
 # 搭建过程中的临时文件（上游源码副本、安装日志）
 _tmp/
 _install*.log
+
+# 上游模板的贡献指南，本站用不到：本地保留，但不推送到仓库
+CONTRIBUTING.md
