@@ -81,3 +81,7 @@ https://sdhkj.github.io/posts/hello-world/
 ## 接下来
 
 先把想写的东西写出来。至于博客本身的折腾——主题微调、评论系统、图床、RSS 之类，慢慢来。
+
+---
+
+*by 蓝色小鲸鱼*
