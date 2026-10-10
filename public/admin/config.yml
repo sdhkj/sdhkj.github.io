@@ -1,0 +1,165 @@
+# =============================================================================
+# Sveltia CMS 配置（Netlify/Decap CMS 兼容格式）
+# 字段与 Fuwari 的 src/content/config.ts 里的 Zod schema 严格对齐，
+# 修改本文件前请先读那个文件，否则保存出来的 md 会让 `pnpm build` 失败。
+#
+# Fuwari 的 frontmatter schema（src/content/config.ts）：
+#   title: string（必填）
+#   published: Date（必填，写作 2023-09-09 这种 YYYY-MM-DD 纯量）
+#   updated: Date（可选）
+#   draft: boolean（可选，默认 false）
+#   description: string（可选，默认 ""）
+#   image: string（可选，默认 ""）
+#   tags: string[]（可选，默认 []）
+#   category: string | null（可选，默认 ""）
+#   lang: string（可选，默认 ""）
+# =============================================================================
+
+backend:
+  name: github
+  repo: sdhkj/sdhkj.github.io
+  branch: main
+  # ↓↓↓ 部署完 worker/ 里的 Cloudflare Worker 后，把这里换成真实地址（不要结尾的 /）
+  #     例如 https://sveltia-cms-auth.sdhkj.workers.dev
+  base_url: https://REPLACE-ME.workers.dev
+  # 公开仓库只需要写入权限时，可以把授权范围收窄（可选，默认 repo,user）
+  # auth_scope: public_repo,user
+
+# 本地写作开关。
+# 注意：Sveltia CMS 已放弃 Decap 的代理式本地后端（源码里 local_backend 被标记为
+# unsupported 并被忽略，打开 /admin 时只会提示该选项无效）。这里保留它是为了兼容
+# 习惯 Decap 配置的读者；真正生效的本地写作方式是 /admin 页面上的
+# “Work with Local Repository” 按钮（Chromium 的 File System Access API），
+# 具体步骤见根目录 README.md 的「本地写作」一节。
+local_backend: true
+
+publish_mode: simple
+
+# 关键：省略空的可选字段。
+# 默认值是 false，此时留空的 `updated` 会被写成 `updated: ''`，
+# 而 Astro 的 z.date() 不接受空字符串，构建会直接报错。必须保持 true。
+output:
+  omit_empty_optional_fields: true
+  yaml:
+    indent_size: 2
+    quote: none
+
+# 图片上传到 Fuwari 的 public/ 目录，frontmatter 里写成 /images/xxx.png。
+# Fuwari 把以 "/" 开头的 image 当作 public 路径处理（见 src/components/misc/ImageWrapper.astro）。
+# 注意 media_folder 相对仓库根目录，public_folder 是站点上的绝对路径。
+media_folder: public/images
+public_folder: /images
+
+# 全局 slug（文件名）规则。
+# encoding: unicode 会保留中文，中文标题生成中文文件名（可正常构建、也能被 Git 跟踪）；
+# 若改成 ascii，纯中文标题会被清空并退化成随机 UUID，不建议。
+slug:
+  encoding: unicode
+  clean_accents: false
+  sanitize_replacement: "-"
+  trim: true
+
+collections:
+  - name: posts
+    label: 文章
+    label_singular: 文章
+    description: 博客文章，写入 src/content/posts/<文件名>.md
+    folder: src/content/posts
+    create: true
+    delete: true
+    extension: md
+    format: frontmatter
+    # 文件名模板：src/content/posts/{{slug}}.md，新建时可在编辑器侧栏手动改
+    path: "{{slug}}"
+    slug: "{{slug}}"
+    identifier_field: title
+    # Astro 的路由是 /posts/<文件名>/（trailingSlash: always）
+    preview_path: "posts/{{slug}}/"
+    summary: "{{title}} — {{published}}"
+    sortable_fields: [published, title]
+    view_filters:
+      - label: 仅草稿
+        field: draft
+        pattern: true
+    fields:
+      - label: 标题
+        name: title
+        widget: string
+
+      - label: 发布日期
+        name: published
+        widget: datetime
+        # 只取日期，并保证写成 `published: 2023-09-09`（不加引号），
+        # 与 Fuwari 示例文章一致，Astro 的 yaml 解析会得到 Date。
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+        picker_utc: true
+
+      - label: 更新日期
+        name: updated
+        widget: datetime
+        required: false
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+        picker_utc: true
+        hint: 留空即可；留空时不会写入 frontmatter（依赖上面的 output.omit_empty_optional_fields）
+
+      - label: 摘要
+        name: description
+        widget: text
+        required: false
+        default: ""
+        hint: 显示在文章列表和 SEO 描述里
+
+      - label: 封面图
+        name: image
+        widget: image
+        required: false
+        default: ""
+        hint: 上传后写入 /images/<文件名>；留空则不显示封面
+
+      - label: 标签
+        name: tags
+        widget: list
+        required: false
+        default: []
+
+      - label: 分类
+        name: category
+        widget: string
+        required: false
+        default: ""
+
+      - label: 草稿
+        name: draft
+        widget: boolean
+        required: false
+        default: false
+        hint: 勾选后文章仍会构建，但默认在草稿状态（Fuwari 首页会隐藏草稿）
+
+      - label: 语言
+        name: lang
+        widget: string
+        required: false
+        default: ""
+        hint: 例如 zh_CN / en；留空则使用站点默认语言
+
+      # 正文。Sveltia 默认把名为 body 的 markdown 字段作为正文（不写进 frontmatter），
+      # 因此必须保持 name: body，且不需要在 frontmatter 里出现。
+      - label: 正文
+        name: body
+        widget: markdown
+
+  # 关于页：src/content/spec/about.md（Fuwari 的 spec 集合没有 frontmatter schema）
+  - name: pages
+    label: 页面
+    files:
+      - name: about
+        label: 关于
+        file: src/content/spec/about.md
+        fields:
+          - label: 正文
+            name: body
+            widget: markdown

@@ -1,0 +1,15 @@
+{
+	"name": "sveltia-cms-auth-worker",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"description": "Cloudflare Worker OAuth 中转，供 Sveltia CMS 登录 GitHub 使用（源码来自 sveltia/sveltia-cms-auth，MIT）",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"tail": "wrangler tail"
+	},
+	"devDependencies": {
+		"wrangler": "^4.42.0"
+	}
+}

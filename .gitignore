@@ -1,0 +1,42 @@
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+.vercel
+
+package-lock.json
+bun.lockb
+yarn.lock
+
+# ide
+.idea
+*.iml
+
+# pnpm 的仓库内 store（跨盘安装时 pnpm 会自动在此项目下创建）
+.pnpm-store/
+
+# Cloudflare Worker 的本地依赖与 wrangler 缓存
+worker/node_modules/
+worker/.wrangler/
+
+# 搭建过程中的临时文件（上游源码副本、安装日志）
+_tmp/
+_install*.log

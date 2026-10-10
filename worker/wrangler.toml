@@ -1,0 +1,22 @@
+#:schema node_modules/wrangler/config-schema.json
+
+# 部署后的 Worker 名称，决定访问地址：https://<name>.<你的子域>.workers.dev
+# 如果你想换个名字，改这里，并把新地址填回 public/admin/config.yml 的 backend.base_url
+name = "sveltia-cms-auth"
+main = "src/index.js"
+compatibility_date = "2023-03-24"
+
+# GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET 属于密钥，必须用
+#   npx wrangler secret put GITHUB_CLIENT_ID
+#   npx wrangler secret put GITHUB_CLIENT_SECRET
+# 写入，绝对不要写进这个文件（会进 Git 历史）。
+#
+# ALLOWED_DOMAINS 不是密钥，但要防止别人白嫖你的 OAuth 应用，所以在这里限制来源域名。
+# 说明：
+#   - sdhkj.github.io            正式站点
+#   - cms.netlify.com            Sveltia 从 localhost 登录时会把自己的 site_id 报成这个值
+#                                （见 src/index.js 上游逻辑），本地调试要 OAuth 登录就保留它
+#   - localhost                  http://localhost:4321 本地预览
+# 如果绑定了自定义域名，记得把域名也加进来。
+[vars]
+ALLOWED_DOMAINS = "sdhkj.github.io, cms.netlify.com, localhost"
