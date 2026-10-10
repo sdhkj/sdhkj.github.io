@@ -9,6 +9,13 @@
 	</head>
 	<body>
 		<!--
+			兼容补丁：Sveltia CMS 0.233.1 计算配置哈希时会调用 Uint8Array.prototype.toHex()，
+			这是很新的提案 API（Chrome/Edge 140+ 才有），缺失时后台只会显示「意外错误」。
+			必须在 sveltia-cms.js 之前加载。详见该文件头部的说明。
+		-->
+		<script src="/admin/polyfill.js"></script>
+
+		<!--
 			Sveltia CMS 本地化脚本：由 `pnpm run sync:cms` 从 node_modules/@sveltia/cms/dist
 			复制并改写字体路径，不依赖 unpkg / jsdelivr。
 			Sveltia 会从 /admin/config.yml 读取配置（它的默认路径写死为 /admin/config.yml，

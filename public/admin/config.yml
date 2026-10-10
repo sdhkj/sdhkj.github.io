@@ -32,13 +32,10 @@ backend:
   # 默认两种都允许），并补上 base_url —— 完整步骤见根目录 README.md 第 5 节。
   auth_methods: [token]
 
-# 本地写作开关。
-# 注意：Sveltia CMS 已放弃 Decap 的代理式本地后端（源码里 local_backend 被标记为
-# unsupported 并被忽略，打开 /admin 时只会提示该选项无效）。这里保留它是为了兼容
-# 习惯 Decap 配置的读者；真正生效的本地写作方式是 /admin 页面上的
-# “Work with Local Repository” 按钮（Chromium 的 File System Access API），
+# 本地写作不需要任何配置项：Sveltia 的 local_backend 已被官方标记为不支持并忽略
+# （写在配置里只会多一条 "option is not supported" 告警），本地写作真正生效的是
+# /admin 页面上的 “Work with Local Repository” 按钮（Chromium 的 File System Access API），
 # 具体步骤见根目录 README.md 的「本地写作」一节。
-local_backend: true
 
 publish_mode: simple
 
@@ -182,7 +179,9 @@ collections:
         label: 站点信息
         file: src/site-config.json
         format: json
-        description: 改完保存，等一次自动部署（1～3 分钟）即可生效
+        # 注意：集合文件这一层没有 description 选项（JSON schema 里未定义，
+        # 写了只会得到一条 "option is not defined in the schema" 告警），
+        # 想写说明就放在这里当注释。改完保存，等一次自动部署（1～3 分钟）即可生效。
         fields:
           - label: 站点标题
             name: title

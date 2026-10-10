@@ -58,6 +58,7 @@ pnpm sync:cms                    # 把 @sveltia/cms 的脚本/字体同步到 pu
 | 文件 | 作用 |
 | --- | --- |
 | `public/admin/index.html` | CMS 页面，引用本地脚本 `/admin/sveltia-cms.js` |
+| `public/admin/polyfill.js` | **浏览器兼容补丁**，必须在 CMS 脚本之前加载。Sveltia 0.233.1 会调用 `Uint8Array.prototype.toHex()`（Chrome/Edge 140+ 才有的新 API），缺失时后台只显示「意外错误」，这里按提案语义补齐 `toHex`/`fromHex`/`toBase64`/`fromBase64` |
 | `public/admin/config.yml` | CMS 配置：后端、集合、字段定义（**字段与 Fuwari schema 严格对齐**） |
 | `public/admin/sveltia-cms.js` | 由 `pnpm sync:cms` 从 `node_modules/@sveltia/cms/dist/` 复制并本地化，已提交进仓库 |
 | `public/admin/fonts/` | 从 CDN 改写为本地路径的字体/图标字体（Source Sans 3、Noto Mono、Material Symbols） |
@@ -365,6 +366,9 @@ A：前者多见于 Windows 上的 symlink 权限问题（开启“开发者模�
 
 **Q：`pnpm build` 报 `spawn EPERM`（栈里有 `optimizeSafeRealPathSync`）？**
 A：这是 Vite 在 Windows 上探测网络驱动器时起的子进程被拦，不是代码问题。关闭安全软件/沙箱，或换到普通管理员终端重试。
+
+**Q：`/admin/` 打开显示「CMS 配置中存在错误，请解决后重试」+ 一个「意外错误」的框，控制台只有一条没有 message 的报错？**
+A：这是 Sveltia CMS 0.233.1 的浏览器兼容问题，与 `config.yml` 内容无关：它在配置加载的最后一步 `getHash()` 里调用了 `new Uint8Array(digest).toHex()`，而 `Uint8Array.prototype.toHex()` 是 ES2026 提案 API，Chrome/Edge 140 以下都没有，`@sveltia/utils@0.12.3` 也没带 polyfill。抛出的 `TypeError` 会被 `init.js` 的 catch 归到 `_('config.error.unexpected')`，所以界面只显示「意外错误」。本仓库用 `public/admin/polyfill.js`（在 CMS 脚本之前加载）补上了这个 API。如果哪天又出现同样症状，先确认这个文件还在、且 `<script>` 顺序没被改动。
 
 **Q：`/admin/` 打开是空白页或 404？**
 A：确认 `public/admin/index.html` 和 `public/admin/sveltia-cms.js` 都被提交了（脚本有 2.2 MB，别被忽略规则挡住）。构建产物里应有 `dist/admin/index.html` + `dist/admin/sveltia-cms.js`。
