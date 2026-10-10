@@ -3,7 +3,6 @@ title: 博客开张：Astro + Fuwari + Sveltia CMS By 蓝色大肥鱼
 published: 2026-10-10
 description: 本站的技术选型与使用说明——Astro + Fuwari 负责渲染，Sveltia CMS 负责在线写作，GitHub Actions 负责自动发布。
 tags:
-  - 公告
   - Astro
   - Fuwari
   - Sveltia CMS
