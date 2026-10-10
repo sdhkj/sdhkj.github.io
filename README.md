@@ -5,9 +5,9 @@
 - 站点框架：[Astro](https://astro.build/) 5 + [Fuwari](https://github.com/saicaca/fuwari) 模板（MIT，LICENSE 原文保留在仓库根目录）
 - 内容编辑器：[Sveltia CMS](https://sveltiacms.app/)（Netlify/Decap CMS 的现代替代品），脚本与字体已**本地化**，不依赖 unpkg/jsdelivr
 - 部署：GitHub Actions → GitHub Pages
-- 在线登录：自建 Cloudflare Worker 做 GitHub OAuth 中转（源码在 `worker/`，**可选**，见第 3.3 节的替代方案）
+- 在线登录：GitHub **访问令牌（Personal Access Token）**，不需要任何 OAuth 中转服务（若以后想改成 OAuth 一键登录，可选方案见第 5 节；`worker/` 代码保留未删）
 
-> 基于 [saicaca/fuwari](https://github.com/saicaca/fuwari) 模板搭建。原模板的 Vercel 配置（`vercel.json`）、上游自带的 `.github/`（workflow / issue 模板 / dependabot）以及多余的示例文章已清理，只保留 1 篇示例文章。
+> 基于 [saicaca/fuwari](https://github.com/saicaca/fuwari) 模板搭建。原模板的 Vercel 配置（`vercel.json`）、上游自带的 `.github/`（workflow / issue 模板 / dependabot）以及全部示例文章已清理，现在只有一篇自己的开篇文章。
 
 ---
 
@@ -62,6 +62,7 @@ pnpm sync:cms                    # 把 @sveltia/cms 的脚本/字体同步到 pu
 | `public/admin/sveltia-cms.js` | 由 `pnpm sync:cms` 从 `node_modules/@sveltia/cms/dist/` 复制并本地化，已提交进仓库 |
 | `public/admin/fonts/` | 从 CDN 改写为本地路径的字体/图标字体（Source Sans 3、Noto Mono、Material Symbols） |
 | `scripts/sync-sveltia-cms.mjs` | 完成上面两步的脚本 |
+| `src/site-config.json` | **站点信息**（站名、签名、作者/版权名、简介、头像、主题色 hue、导航 GitHub 链接），由 `src/config.ts` 引入并合并；在 `/admin` 的「站点设置」里直接编辑，改完等一次自动部署生效 |
 
 ### 3.1 字段与 Fuwari schema 的对应关系
 
@@ -123,31 +124,42 @@ Sveltia CMS **不再使用** Decap 的 `local_backend` 代理：`local_backend` 
 
 > `public/admin/config.yml` 里的 `local_backend: true` 是为兼容 Decap 配置习惯保留的，实际不生效；真正生效的是上面这个按钮。
 
-### 3.3 在线写作（登录 GitHub，需要 Worker 或 Token）
+### 3.3 在线写作（用 GitHub 访问令牌登录）
 
-`public/admin/config.yml` 里的 `backend.base_url` 现在是占位符：
-
-```yaml
-base_url: https://REPLACE-ME.workers.dev
-```
-
-两种处理方式，**二选一**：
-
-**方案 A（推荐，多人/非技术用户友好）：部署 Cloudflare Worker**，见第 5 节，然后把 `base_url` 替换成真实地址。
-
-**方案 B（最省事，个人博客足够）：用 GitHub Personal Access Token 登录，把 `base_url` 注释掉。**
+本站**不需要**任何 OAuth 中转服务，登录方式只有一种：GitHub 访问令牌（PAT）。
+`public/admin/config.yml` 里已经这么配好了：
 
 ```yaml
 backend:
   name: github
   repo: sdhkj/sdhkj.github.io
   branch: main
-  # base_url: https://REPLACE-ME.workers.dev   # 用 Token 登录时注释掉这一行
+  auth_methods: [token]
 ```
 
-然后在 <https://sdhkj.github.io/admin/> 的登录页点 **“Sign In with Token”**，按提示生成 fine-grained PAT（**Contents: Read and write**；若使用 Editorial Workflow，另需 **Pull requests: Read and write**），粘贴即可。Token 存在浏览器 localStorage 中。
+`auth_methods: [token]` 表示只允许令牌登录、关掉 OAuth 入口（这是 Sveltia 官方文档给出的写法）。
 
-> 注意：只要 `base_url` 还留着 `REPLACE-ME` 占位符，OAuth 方式就无法登录。请务必按上面二选一处理。
+#### 登录步骤
+
+1. 打开 <https://sdhkj.github.io/admin/>
+2. 点 **Sign In with Token**
+3. 弹窗里点它提供的那条链接去 GitHub 生成令牌 —— **权限已经按本站需要预选好了**。
+   如果你更想自己建：
+   - **fine-grained token（推荐）**：Repository access 选 “Only select repositories” 并只勾 `sdhkj/sdhkj.github.io`；Permissions → **Contents: Read and write**。Metadata 权限会自动附带，不用手动加。本站用的是 Simple Workflow，不需要 Pull requests 权限。
+   - **classic token**：勾选 `repo` 这一项即可。
+4. 生成后复制令牌，粘贴回弹窗确认，就登录成功了。
+5. 登录后就能写文章、传图片、改「站点设置」；保存会直接提交到 `main`，1～3 分钟后自动上线。
+
+**令牌只保存在你当前浏览器的 localStorage 里**：换设备、换浏览器、清缓存或用无痕模式，都要重新粘一次。
+
+#### 安全提醒（重要）
+
+- 令牌**不要**写进任何文件、不要提交进仓库、不要贴到 issue 或聊天里。这个仓库是公开的，提交过的东西会永远留在 Git 历史里。
+- 只授权 `sdhkj/sdhkj.github.io` **这一个仓库**（fine-grained token 的 Repository access 选 “Only select repositories”），把影响范围压到最小。
+- 把**过期时间设短一点**（例如 90 天），过期后重新生成一个粘贴即可。
+- 令牌只在你自己的浏览器里，不经过任何第三方服务器（Sveltia 是浏览器直接调 GitHub API）。
+- 怀疑泄露就去 <https://github.com/settings/tokens> 把那个令牌 **Revoke** 掉。
+- 不要在共用电脑上保存令牌；用完可以在右上角账号菜单里 **Sign Out**。
 
 ---
 
@@ -210,9 +222,11 @@ git -c http.proxy= -c https.proxy= push
 
 > 如果 Actions 报 `HttpError: Not Found` 或 “Get Pages site failed”，基本都是第 2 步的 Source 没选成 GitHub Actions。
 
-### 步骤 4：配置 OAuth Worker 并替换 base_url
+### 步骤 4：登录后台开始写（当前默认：访问令牌）
 
-见第 5 节。核心一句话：部署完 Worker 后，把它的地址填回 `public/admin/config.yml` 的 `backend.base_url`，然后提交推送。
+本站现在用**访问令牌**登录，不需要任何额外服务：打开 <https://sdhkj.github.io/admin/> → 点 **Sign In with Token**，按第 3.3 节的操作即可。
+
+只有当你以后想改成 **OAuth 一键登录**（例如要让别人也能用 GitHub 账号登录）时，才需要走第 5 节部署 Cloudflare Worker。
 
 ### 步骤 5：绑定自定义域名（可选）
 
@@ -222,11 +236,15 @@ git -c http.proxy= -c https.proxy= push
 4. 本站用 Actions 发布，GitHub **不会**自动生成 `CNAME` 文件，需要手动在 `public/CNAME` 放一份（内容就是那一行域名，如 `blog.example.com`），否则每次部署后自定义域会丢失
 5. 自定义域生效后记得：
    - 把 `astro.config.mjs` 的 `site` 改成自定义域名（影响 RSS、sitemap、绝对链接）
-   - 把新域名加进 Worker 的 `ALLOWED_DOMAINS`
+   - 如果你启用了第 5 节的 OAuth Worker，还要把新域名加进它的 `ALLOWED_DOMAINS`（用访问令牌登录则不需要）
 
 ---
 
-## 5. 部署 Cloudflare Worker（GitHub OAuth 中转）
+## 5. 可选：部署 Cloudflare Worker 改用 OAuth 一键登录
+
+> **当前站点默认不需要这一节。** 本站现在用访问令牌登录（见第 3.3 节），完全不依赖任何 OAuth 服务。
+> 只有当你想让**别人（非技术用户）也能用 GitHub 账号一键登录**时，才需要部署下面这个 Worker。
+> `worker/` 里的代码和 `wrangler.toml` 都完整保留着，随时可以直接部署。
 
 `sveltia-cms-auth`（MIT，源码已放在 `worker/`，只加了一个说明用的注释头，许可证副本为 `worker/LICENSE.txt`）是一个无依赖的 Cloudflare Worker，只做两件事：
 
@@ -281,7 +299,9 @@ https://sveltia-cms-auth.<你的子域>.workers.dev
 > 密钥**不要**写进 `wrangler.toml`。`ALLOWED_DOMAINS` 不是密钥，已经写在 `wrangler.toml` 的 `[vars]` 里，用于限制哪些站点可以使用你的 Worker（防盗用）：
 > `sdhkj.github.io, cms.netlify.com, localhost` —— `cms.netlify.com` 是 Sveltia 从 localhost 登录时上报的 `site_id`，本地调试需要它。绑定自定义域名后记得把域名也加进去。
 
-### 5.4 把 Worker 地址填回 CMS 配置
+### 5.4 把 Worker 地址填回 CMS 配置（并重新打开 OAuth 入口）
+
+⚠️ 现在 `config.yml` 里是 `auth_methods: [token]`，**它会把 OAuth 登录入口关掉**。要用 Worker 就得同时把 `oauth` 加回来，否则登录页不会出现 “Sign In with GitHub”。
 
 编辑 `public/admin/config.yml`：
 
@@ -290,7 +310,9 @@ backend:
   name: github
   repo: sdhkj/sdhkj.github.io
   branch: main
-  base_url: https://sveltia-cms-auth.<你的子域>.workers.dev   # ← 替换占位符，结尾不要带 /
+  # 加上 oauth（也可以直接删掉 auth_methods 这一行，默认两种方式都允许）
+  auth_methods: [oauth, token]
+  base_url: https://sveltia-cms-auth.<你的子域>.workers.dev   # 结尾不要带 /
 ```
 
 提交推送：
@@ -301,7 +323,7 @@ git commit -m "chore: 配置 Sveltia CMS OAuth Worker 地址"
 git -c http.proxy= -c https.proxy= push
 ```
 
-等 Actions 部署完，打开 <https://sdhkj.github.io/admin/> → **Sign In with GitHub**，保存会直接提交到 `main` 并触发重新部署。
+等 Actions 部署完，打开 <https://sdhkj.github.io/admin/>，登录页就会多出 **Sign In with GitHub**；用哪种方式登录都可以，保存都会直接提交到 `main` 并触发重新部署。
 
 ### 5.5 本地调试 Worker（可选）
 
@@ -319,9 +341,10 @@ npx wrangler dev            # 默认 http://localhost:8787
 ```
 .
 ├── astro.config.mjs            # site = https://sdhkj.github.io/, base = "/"
-├── src/config.ts               # 站点标题、导航、个人信息、主题色
+├── src/site-config.json        # 站点信息（站名、签名、头像、主题色、版权名、GitHub 链接），可在 /admin 的「站点设置」里改
+├── src/config.ts               # 引入上面的 JSON 并合并成 siteConfig / navBarConfig / profileConfig
 ├── src/content/config.ts       # Fuwari 的 Zod schema（CMS 字段以它为准）
-├── src/content/posts/          # 文章（只保留 1 篇示例：guide/index.md）
+├── src/content/posts/          # 文章（现有 hello-world.md；URL 为 /posts/<文件名>/）
 ├── public/admin/index.html     # Sveltia CMS 页面
 ├── public/admin/config.yml     # Sveltia CMS 配置
 ├── public/admin/sveltia-cms.js # 本地化后的 CMS 脚本（由 pnpm sync:cms 生成，已提交）
@@ -329,7 +352,7 @@ npx wrangler dev            # 默认 http://localhost:8787
 ├── public/images/              # CMS 上传的图片（media_folder）
 ├── scripts/sync-sveltia-cms.mjs
 ├── scripts/new-post.js         # 上游的新建文章脚本
-├── worker/                     # Cloudflare Worker OAuth 中转（wrangler.toml + src/index.js + README）
+├── worker/                     # Cloudflare Worker OAuth 中转（可选，当前站点未使用；代码保留）
 └── .github/workflows/deploy.yml
 ```
 

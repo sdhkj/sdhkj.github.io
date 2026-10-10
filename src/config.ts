@@ -1,3 +1,4 @@
+import siteConfigData from "./site-config.json";
 import type {
 	ExpressiveCodeConfig,
 	LicenseConfig,
@@ -7,12 +8,20 @@ import type {
 } from "./types/config";
 import { LinkPreset } from "./types/config";
 
+/*
+ * 面向访客、经常要改的站点信息集中在 ./site-config.json，
+ * 可以在博客后台 /admin 的「站点设置」里直接编辑（见 public/admin/config.yml 的 settings）。
+ *
+ * 这里只保留需要写代码/带类型约束的字段：lang、banner、toc、favicon、license、expressiveCode。
+ * 改完 src/site-config.json 后本地跑 `pnpm dev` 或 `pnpm build` 即可生效。
+ */
+
 export const siteConfig: SiteConfig = {
-	title: "sdhkj 的博客",
-	subtitle: "记录与分享",
+	title: siteConfigData.title,
+	subtitle: siteConfigData.subtitle,
 	lang: "zh_CN", // Language code, e.g. 'en', 'zh_CN', 'ja', etc.
 	themeColor: {
-		hue: 250, // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
+		hue: siteConfigData.themeColorHue, // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
 		fixed: false, // Hide the theme color picker for visitors
 	},
 	banner: {
@@ -46,21 +55,23 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.About,
 		{
 			name: "GitHub",
-			url: "https://github.com/sdhkj", // Internal links should not include the base path, as it is automatically added
+			url: siteConfigData.githubUrl, // Internal links should not include the base path, as it is automatically added
 			external: true, // Show an external link icon and will open in a new tab
 		},
 	],
 };
 
 export const profileConfig: ProfileConfig = {
-	avatar: "assets/images/demo-avatar.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
-	name: "sdhkj",
-	bio: "基于 Fuwari 模板搭建的 Astro 博客。",
+	// 头像：相对 /src 的路径（会被 Astro 图片管线处理），以 "/" 开头则是 /public 下的路径，
+	// 也可以直接写 http(s) 外链。
+	avatar: siteConfigData.avatar,
+	name: siteConfigData.authorName, // 侧栏名字、页脚版权名、meta author
+	bio: siteConfigData.bio,
 	links: [
 		{
 			name: "GitHub",
 			icon: "fa6-brands:github",
-			url: "https://github.com/sdhkj",
+			url: siteConfigData.githubUrl,
 		},
 	],
 };

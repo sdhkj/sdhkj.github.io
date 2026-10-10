@@ -19,11 +19,18 @@ backend:
   name: github
   repo: sdhkj/sdhkj.github.io
   branch: main
-  # ↓↓↓ 部署完 worker/ 里的 Cloudflare Worker 后，把这里换成真实地址（不要结尾的 /）
-  #     例如 https://sveltia-cms-auth.sdhkj.workers.dev
-  base_url: https://REPLACE-ME.workers.dev
-  # 公开仓库只需要写入权限时，可以把授权范围收窄（可选，默认 repo,user）
-  # auth_scope: public_repo,user
+  # 只用「访问令牌（GitHub Personal Access Token）」登录，不需要任何 OAuth 中转服务：
+  # 这里既没有 base_url，也没有 auth_scope —— 那两个选项只跟 OAuth 有关，现在用不到了。
+  #
+  # 登录流程：打开 /admin → 点 “Sign In with Token” → 弹窗里会给出一条已经预选好权限的
+  # GitHub 令牌生成链接，生成后把令牌粘贴回弹窗即可。
+  #
+  # 令牌只保存在你当前浏览器的 localStorage 里：不会写进仓库，也不经过任何第三方服务器
+  # （Sveltia 是浏览器直接调用 GitHub 的 API）。
+  #
+  # 以后想改回 OAuth 一键登录时，把这一行换成 auth_methods: [oauth, token]（或整行删掉，
+  # 默认两种都允许），并补上 base_url —— 完整步骤见根目录 README.md 第 5 节。
+  auth_methods: [token]
 
 # 本地写作开关。
 # 注意：Sveltia CMS 已放弃 Decap 的代理式本地后端（源码里 local_backend 被标记为
@@ -163,3 +170,58 @@ collections:
           - label: 正文
             name: body
             widget: markdown
+
+  # 站点设置：src/site-config.json
+  # 这个 JSON 被 src/config.ts import 后合并进 siteConfig / navBarConfig / profileConfig。
+  # 字段名必须和那个 JSON 的 key 完全一致，输出格式固定为 json（2 空格缩进），
+  # 数字类型用 value_type: int，否则会被写成字符串导致 hue 失效。
+  - name: settings
+    label: 站点设置
+    files:
+      - name: site
+        label: 站点信息
+        file: src/site-config.json
+        format: json
+        description: 改完保存，等一次自动部署（1～3 分钟）即可生效
+        fields:
+          - label: 站点标题
+            name: title
+            widget: string
+            hint: 显示在导航栏、浏览器标签页、RSS 标题里
+
+          - label: 副标题 / 签名
+            name: subtitle
+            widget: string
+            hint: 首页浏览器标题里显示为「站点标题 - 副标题」
+
+          - label: 作者名 / 页脚版权名
+            name: authorName
+            widget: string
+            hint: 同时用于侧栏名字、页脚版权、meta author、RSS 标题
+
+          - label: 侧栏个人简介
+            name: bio
+            widget: string
+            required: false
+            hint: 头像下方那行小字
+
+          - label: 头像
+            name: avatar
+            widget: image
+            required: false
+            hint: 可以直接粘贴外链，例如 https://github.com/sdhkj.png；上传则会存到 /images/ 下
+
+          - label: 主题色 Hue
+            name: themeColorHue
+            widget: number
+            value_type: int
+            min: 0
+            max: 360
+            default: 250
+            hint: 0～360。红 0、青 200、蓝紫 250、粉 345；默认 250
+
+          - label: 导航栏 GitHub 链接
+            name: githubUrl
+            widget: string
+            hint: 也用作侧栏的 GitHub 图标链接
+

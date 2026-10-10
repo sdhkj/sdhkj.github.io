@@ -1,0 +1,9 @@
+{
+	"title": "sdhkj 的博客",
+	"subtitle": "记录与分享",
+	"authorName": "sdhkj",
+	"bio": "基于 Fuwari 模板搭建的 Astro 博客。",
+	"avatar": "assets/images/avatar.jpg",
+	"themeColorHue": 250,
+	"githubUrl": "https://github.com/sdhkj"
+}

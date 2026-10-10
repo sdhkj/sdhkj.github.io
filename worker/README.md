@@ -1,5 +1,10 @@
 # Cloudflare Worker：Sveltia CMS 的 GitHub OAuth 中转
 
+> **当前站点默认不需要部署这个 Worker。** 站点现在用 GitHub 访问令牌（PAT）登录：
+> `public/admin/config.yml` 里是 `auth_methods: [token]`，没有 `base_url`，不存在任何 OAuth 依赖。
+> **只有当你以后想改用 OAuth 一键登录**（例如让别人也能用 GitHub 账号登录 CMS）时，才需要部署它，
+> 并在部署后把 `auth_methods` 改回 `[oauth, token]`、补上 `base_url`。
+
 这个目录是给 Sveltia CMS 做 OAuth 中转的 Cloudflare Worker，用来让 `https://sdhkj.github.io/admin/`
 上的编辑器能「Sign In with GitHub」。
 
@@ -7,9 +12,9 @@
 - `wrangler.toml`：部署配置（Worker 名称、`compatibility_date`、`ALLOWED_DOMAINS`）。
 - `package.json`：只声明 `wrangler` 作为 devDependency。
 
-> **它不是必须的。** 如果你只是想自己一个人写博客，可以直接在 CMS 登录页用
-> 「Sign In with Token」+ 一个 GitHub fine-grained PAT（Contents: Read and write）登录，
-> 同时把根目录 `public/admin/config.yml` 里的 `backend.base_url` 注释掉。
+> **它不是必须的。** 自己一个人写博客的话，直接在 CMS 登录页用
+> 「Sign In with Token」+ 一个 GitHub fine-grained PAT（Contents: Read and write）登录就够了，
+> 这也是当前站点的默认做法（`config.yml` 里 `auth_methods: [token]`）。
 > 只有需要让**非技术用户 / 多人**用 GitHub 账号登录时，才值得部署这个 Worker。
 
 ## 部署步骤
@@ -36,13 +41,15 @@ npx wrangler secret put GITHUB_CLIENT_SECRET
 npx wrangler deploy
 ```
 
-部署完成后，把打印出来的 Worker 地址填回根目录的 `public/admin/config.yml`：
+部署完成后，把打印出来的 Worker 地址填回根目录的 `public/admin/config.yml`，
+**同时把 `auth_methods` 加上 `oauth`**（否则 OAuth 登录入口是关着的）：
 
 ```yaml
 backend:
   name: github
   repo: sdhkj/sdhkj.github.io
   branch: main
+  auth_methods: [oauth, token]     # 只写 [token] 时不会出现 “Sign In with GitHub”
   base_url: https://sveltia-cms-auth.<你的子域>.workers.dev
 ```
 
@@ -66,7 +73,7 @@ backend:
 npx wrangler dev            # 默认 http://localhost:8787
 ```
 
-把 `config.yml` 的 `base_url` 临时改成 `http://localhost:8787` 即可调试。
+把 `config.yml` 的 `base_url` 临时改成 `http://localhost:8787`，并把 `auth_methods` 设为 `[oauth, token]`，即可调试 OAuth 登录。
 
 ## 请求路径
 
