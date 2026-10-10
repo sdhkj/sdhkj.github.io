@@ -18,13 +18,13 @@ lang: zh_CN
 
 三件事：
 
-1. **[Astro](https://astro.build/)** —— 静态站点生成器。构建时把所有页面渲染成纯 HTML，没有服务端，所以能免费托管在 GitHub Pages 上，速度也快。
-2. **[Fuwari](https://github.com/saicaca/fuwari)** —— 一套 Astro 博客主题（MIT 协议），提供了现在看到的这套布局：卡片式首页、归档页、深浅色切换、主题色、文章目录、基于 Pagefind 的全文搜索。我只做了一点定制。
-3. **[Sveltia CMS](https://sveltiacms.app/)** —— 网页版编辑器。它直接读写 GitHub 仓库里的 Markdown 文件，不需要数据库，也不需要服务器。也就是说：**内容本质上就是 Git 仓库里的一堆 `.md` 文件**，CMS 只是一个方便的界面。
+1. [**Astro**](https://astro.build/) —— 静态站点生成器。构建时把所有页面渲染成纯 HTML，没有服务端，所以能免费托管在 GitHub Pages 上，速度也快。
+2. [**Fuwari**](https://github.com/saicaca/fuwari) —— 一套 Astro 博客主题（MIT 协议），提供了现在看到的这套布局：卡片式首页、归档页、深浅色切换、主题色、文章目录、基于 Pagefind 的全文搜索。我只做了一点定制。
+3. [**Sveltia CMS**](https://sveltiacms.app/) —— 网页版编辑器。它直接读写 GitHub 仓库里的 Markdown 文件，不需要数据库，也不需要服务器。也就是说：\*\*内容本质上就是 Git 仓库里的一堆 `.md` 文件\*\*，CMS 只是一个方便的界面。
 
 发布流程是一条直线：
 
-```
+```plain
 在 /admin 写完 → 保存 → CMS 提交到 GitHub 仓库 → GitHub Actions 构建 → GitHub Pages 上线
 ```
 
@@ -35,18 +35,18 @@ lang: zh_CN
 1. 打开 `/admin`，用 GitHub 账号登录（或者用 Personal Access Token 登录）。
 2. 左侧选择**「文章」**集合，点右上角的 **New 文章**。
 3. 填写表单：
-   - **标题**：会显示在列表和文章页顶部
-   - **发布日期**：注意格式是 `YYYY-MM-DD`
-   - **摘要**：列表页和搜索引擎用，尽量写一句完整的话
-   - **封面图**：可以先留空，之后再加
-   - **标签 / 分类**：标签可以有多个，分类一般一个
-   - **草稿**：勾上就不会出现在首页和归档里
-   - **正文**：Markdown 编辑器，支持工具栏、粘贴图片、代码块
+    - **标题**：会显示在列表和文章页顶部
+    - **发布日期**：注意格式是 `YYYY-MM-DD`
+    - **摘要**：列表页和搜索引擎用，尽量写一句完整的话
+    - **封面图**：可以先留空，之后再加
+    - **标签 / 分类**：标签可以有多个，分类一般一个
+    - **草稿**：勾上就不会出现在首页和归档里
+    - **正文**：Markdown 编辑器，支持工具栏、粘贴图片、代码块
 4. 点 **Save**（或 Publish）。
 
 侧栏里还能改**文件名（Slug）**——它决定了文章的网址，比如文件名 `hello-world` 对应的地址就是：
 
-```
+```plain
 https://sdhkj.github.io/posts/hello-world/
 ```
 
@@ -74,7 +74,7 @@ https://sdhkj.github.io/posts/hello-world/
 - 图片会和源码一起进 Git 历史，仓库体积越来越大，克隆变慢
 - GitHub Pages 对单文件大小和流量都有软限制，不适合当图床
 
-所以图片**先用着，等文章多了、图变大了再换图床**（对象存储 + CDN，或者 Cloudflare R2、七牛、又拍云之类都行）。换成图床之后，Markdown 里的图片地址直接替换成外链即可，不需要改任何代码。
+所以图片**先用着，等文章多了、图变大了再换图床**（对象存储 + CDN，或者 Cloudflare R2、）。换成图床之后，Markdown 里的图片地址直接替换成外链即可，不需要改任何代码。
 
 另外，**封面图**（frontmatter 里的 `image` 字段）既可以用 `/images/xxx.png` 这种仓库内的路径，也可以之后换成图床的外链。
 
@@ -86,6 +86,4 @@ https://sdhkj.github.io/posts/hello-world/
 
 先把想写的东西写出来。至于博客本身的折腾——主题微调、评论系统、图床、RSS 之类，慢慢来。
 
----
-
-*by 蓝色小鲸鱼*
+***
